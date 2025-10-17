@@ -1,0 +1,156 @@
+buttons_overlay.dts
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2835";
+
+    fragment@0 {
+        target-path = "/";
+        __overlay__ {
+            my_buttons {
+                compatible = "my,buttons";
+                button1-gpios = <&gpio 5 0>;  // GPIO5
+                button2-gpios = <&gpio 6 0>;  // GPIO6
+                button3-gpios = <&gpio 26 0>; // GPIO26
+                button4-gpios = <&gpio 16 0>; // GPIO16
+
+                pinctrl-names = "default";
+                pinctrl-0 = <&buttons_pins>;
+                status = "okay";
+            };
+        };
+    };
+
+    fragment@1 {
+        target = <&gpio>;
+        __overlay__ {
+            buttons_pins: buttons_pins {
+                brcm,pins = <5 6 26 16>;
+                brcm,function = <0 0 0 0>; // input
+                brcm,pull = <2 2 2 2>;     // pull-up
+            };
+        };
+    };
+};
+
+
+dtc -@ -I dts -O dtb -o buttons_overlay.dtbo buttons_overlay.dts
+sudo cp buttons_overlay.dtbo /boot/overlays/
+echo "dtoverlay=buttons_overlay" | sudo tee -a /boot/firmware/config.txt
+
+
+
+buttons_driver.c
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/platform_device.h>
+#include <linux/of.h>
+#include <linux/of_gpio.h> 
+#include <linux/gpio.h>
+#include <linux/interrupt.h>
+
+struct button_dev {
+    int gpio[4];
+    int irq[4];
+};
+
+static irqreturn_t button_isr(int irq, void *dev_id)
+{
+    pr_info("buttons_driver: Button IRQ triggered: irq=%d\n", irq);
+    return IRQ_HANDLED;
+}
+
+static int buttons_probe(struct platform_device *pdev)
+{
+    struct device *dev = &pdev->dev;
+    struct device_node *np = dev->of_node;
+    struct button_dev *bdev;
+    int i, ret;
+
+    bdev = devm_kzalloc(dev, sizeof(*bdev), GFP_KERNEL);
+    if (!bdev)
+        return -ENOMEM;
+
+    for (i = 0; i < 4; i++) {
+        char prop[32];
+        snprintf(prop, sizeof(prop), "button%d-gpios", i+1);
+
+        bdev->gpio[i] = of_get_named_gpio(np, prop, 0);
+        if (!gpio_is_valid(bdev->gpio[i])) {
+            dev_err(dev, "Invalid GPIO for %s\n", prop);
+            return -EINVAL;
+        }
+
+        ret = devm_gpio_request_one(dev, bdev->gpio[i], GPIOF_IN, prop);
+        if (ret) {
+            dev_err(dev, "Failed to request GPIO %d\n", bdev->gpio[i]);
+            return ret;
+        }
+
+        bdev->irq[i] = gpio_to_irq(bdev->gpio[i]);
+        if (bdev->irq[i] < 0) {
+            dev_err(dev, "Failed to get IRQ for GPIO %d\n", bdev->gpio[i]);
+            return bdev->irq[i];
+        }
+
+        ret = devm_request_threaded_irq(dev, bdev->irq[i],
+            NULL, button_isr,
+            IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+            prop, bdev);
+
+        if (ret) {
+            dev_err(dev, "Unable to request IRQ %d for GPIO %d\n", bdev->irq[i], bdev->gpio[i]);
+            return ret;
+        }
+
+        dev_info(dev, "Button %d mapped to GPIO %d, IRQ %d\n",
+                 i+1, bdev->gpio[i], bdev->irq[i]);
+    }
+
+    platform_set_drvdata(pdev, bdev);
+
+    return 0;
+}
+
+static void buttons_remove(struct platform_device *pdev)
+{
+    pr_info("buttons_driver: Removed\n");
+}
+
+static const struct of_device_id buttons_of_match[] = {
+    { .compatible = "mycompany,buttons", },
+    {},
+};
+MODULE_DEVICE_TABLE(of, buttons_of_match);
+
+static struct platform_driver buttons_driver = {
+    .probe  = buttons_probe,
+    .remove = buttons_remove, // ??remove_new ?꾨떂!
+    .driver = {
+        .name           = "buttons_driver",
+        .of_match_table = buttons_of_match,
+    },
+};
+module_platform_driver(buttons_driver);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Your Name");
+MODULE_DESCRIPTION("4-Button Platform Driver Example (Raspberry Pi)");
+
+
+Makefile
+
+obj-m += buttons_driver.o
+
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+
+make
+sudo insmod buttons_driver.ko
