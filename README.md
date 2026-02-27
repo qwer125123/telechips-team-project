@@ -92,7 +92,7 @@ Raspberry Pi GPIO를 이용한 버튼 입력 드라이버를 구현하였다.
 
 ```bash
 python lane_detection.py
-'''
+```
 
 #  2차 프로젝트 — Telechips  보드 포팅 및 최적화
 
