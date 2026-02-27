@@ -198,7 +198,7 @@ python lane_detection.py
 
 ---
 
-# 🧠 프로젝트 성과
+#  프로젝트 성과
 
 - 임베디드 시스템 설계 및 구현 경험 확보
 - 영상 기반 차선 인식 알고리즘 구현
@@ -207,7 +207,7 @@ python lane_detection.py
 
 ---
 
-# 🛠 기술 스택
+#  기술 스택
 
 - C/C++/Python
 - Embedded System
