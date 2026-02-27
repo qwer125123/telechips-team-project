@@ -79,7 +79,7 @@
 ## 1. 시스템 아키텍처 (직접 개발 영역 표시)
 <img width="1072" height="491" src="https://github.com/user-attachments/assets/00399124-4fde-41c9-8195-0f54f66ec349" />
 
-- 기존 구조 → Telechips AI 보드 환경 포팅
+- 기존 구조 → Telechips 보드 환경 포팅
 - AI 추론 구조 개선
 - 실시간 처리 성능 최적화
 
