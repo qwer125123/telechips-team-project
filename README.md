@@ -198,6 +198,37 @@ python lane_detection.py
 
 ---
 
+# 추가적인 내용 
+- Raspberry Pi와 MCP2515 CAN 모듈을 사용하여 Linux SocketCAN 기반 CAN 통신 환경을 구성
+```
+cd /boot/firmware
+sudo gedit config.txt
+
+dtparam=spi=on
+dtoverlay=mcp2515-can0,oscillator=12000000,interrupt=25,spimaxfrequency=2000000
+
+sudo reboot
+
+# CAN 드라이버 로드
+sudo ip link set can0 up type can bitrate 500000
+
+# 상태 확인
+ifconfig can0
+
+sudo apt install can-utils
+
+ip -details link show can0
+
+# CAN 메시지 송신 테스트
+cansend can0 123#DEADBEEF
+
+# CAN 메시지 수신 테스트
+candump can0
+```
+<img width="602" height="370" alt="image" src="https://github.com/user-attachments/assets/6215498b-f468-4053-91b0-0f870f31424f" />
+
+
+
 #  프로젝트 성과
 
 - 임베디드 시스템 설계 및 구현 경험 확보
