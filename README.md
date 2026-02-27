@@ -206,5 +206,6 @@ python lane_detection.py
 - GPIO Driver
 - 영상 처리
 - 딥러닝 기반 차선 인식
+- Can 통신
 
  
