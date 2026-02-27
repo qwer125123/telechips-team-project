@@ -129,9 +129,26 @@ python lane_detection.py
 
 ---
 
-## 4. 코드
-- `mcb` : 충돌 방지 시스템
-- `lane_detection_v2` : 딥러닝 기반 차선 인식
+## 4. Mcb 코드 설명 
+- `mcb.cpp` : 충돌 방지 시스템
+
+---
+
+## 5. lane_detection 설명 (UFLD 기반 차선 인식)
+
+- Telechips AI SDK 환경에서 제공된 UFLD(Ultra Fast Lane Detection) 모델을 사용하여
+  딥러닝 기반 차선 인식 기능을 구현
+
+- 카메라 입력 영상 전처리, 모델 추론 실행, 결과 후처리 및 차량 제어 시스템 연동 과정 구현
+
+- NPU 가속 환경에서 실시간 추론 파이프라인 구성 및 성능 테스트 수행
+
+※ 코드 미첨부 사유  
+- Telechips 사내 AI SDK 및 실행 환경을 기반으로 동작하는 구조로  
+  모델 내부 구현 코드 수정 없이 제공된 툴 환경에서 모델 적용 및 최적화를 수행함
+
+참고 자료  
+- 노션 정리: https://halved-engine-6fb.notion.site/AI-G-UFLD-Ultra-Fast-Lane-Detection-28fa6ecfd83980e1850ae089ab9b20dd
 
 ---
 
