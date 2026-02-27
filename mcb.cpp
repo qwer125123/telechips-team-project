@@ -127,7 +127,7 @@ int main() {
     int COUNTER = 0;
     int last_state = 0;
 
-    cout << "📡 초기화 완료. 충격 감지되면 얼굴 분석 시작..." << endl;
+    cout << "초기화 완료. 충격 감지되면 얼굴 분석 시작..." << endl;
 
     Mat frame;
     while (true) {
