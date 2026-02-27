@@ -128,8 +128,13 @@ python lane_detection.py
 ---
 
 ## 3. 실행 결과
+
+### 3-1. MCB (충돌 방지 자동 제동 시스템)
 <img width="802" height="382" src="https://github.com/user-attachments/assets/b144487e-60d1-42e6-b66f-0bcd417984fc" />
 <img width="808" height="378" src="https://github.com/user-attachments/assets/615b5d0e-10fd-4f8c-8408-901698831cbf" />
+---
+
+### 3-2. UFLD 딥러닝 기반 차선 인식
 <img width="810" height="390" src="https://github.com/user-attachments/assets/ccafcd57-7cd1-48c0-ad2c-39bd15068a08" />
 
 ---
